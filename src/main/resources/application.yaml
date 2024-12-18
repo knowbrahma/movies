@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: movie-info
+  profiles:
+    active: local
+server:
+  port: 8080
+logging:
+  level:
+    web: DEBUG
+---
+spring:
+  config:
+    activate:
+      on-profile:
+        - local
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: local
+
+
+
+
+
