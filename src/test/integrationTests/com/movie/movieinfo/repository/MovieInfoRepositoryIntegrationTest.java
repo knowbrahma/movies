@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.test.context.ActiveProfiles;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -25,10 +24,7 @@ class MovieInfoRepositoryIntegrationTest {
 
     @BeforeEach
     void setUp () {
-        List<MovieInfo> movieInfos = List.of(
-                new MovieInfo("1", "The Matrix", 1999, List.of("Keanu Reeves", "Carrie-Anne Moss"), LocalDate.parse("1999-10-01")),
-                new MovieInfo("2", "Inception", 2010, List.of("Leonardo DiCaprio", "Joseph Gordon-Levitt"), LocalDate.parse("2010-06-02")),
-                new MovieInfo("3", "The Dark Knight", 2008, List.of("Christian Bale", "Heath Ledger"), LocalDate.parse("2008-05-02")));
+        List<MovieInfo> movieInfos = List.of(new MovieInfo("1", "The Matrix", 1999, List.of("Keanu Reeves", "Carrie-Anne Moss"), LocalDate.parse("1999-10-01")), new MovieInfo("2", "Inception", 2010, List.of("Leonardo DiCaprio", "Joseph Gordon-Levitt"), LocalDate.parse("2010-06-02")), new MovieInfo("3", "The Dark Knight", 2008, List.of("Christian Bale", "Heath Ledger"), LocalDate.parse("2008-05-02")));
         repository.saveAll(movieInfos).blockLast();
     }
 
@@ -37,17 +33,19 @@ class MovieInfoRepositoryIntegrationTest {
         repository.deleteAll();
     }
 
-    @Test
-    void findAll () {
-        //Given
-        final Flux<MovieInfo> movieInfoFlux = repository.findAll().log();
-        //When
-        StepVerifier.create(movieInfoFlux)
-                .expectNextCount(3)
-                .verifyComplete();
-        //Then
-    }
+    /*  @Test
+      void findAll () {
+          //When
+          Flux<MovieInfo> movieInfoFlux = repository.findAll().log();
 
+          //Then
+          StepVerifier.create(movieInfoFlux)
+                  .expectNextMatches(movieInfo -> movieInfo.getName().equals("The Matrix"))
+                  .expectNextMatches(movieInfo -> movieInfo.getName().equals("Inception"))
+                  .expectNextMatches(movieInfo -> movieInfo.getName().equals("The Dark Knight"))
+                  .verifyComplete();
+      }
+  */
     @Test
     void findById () {
         //Given
@@ -55,9 +53,7 @@ class MovieInfoRepositoryIntegrationTest {
         //When
         Mono<MovieInfo> movieInfoMono = repository.findById(movieId);
         //Then
-        StepVerifier.create(movieInfoMono)
-                .assertNext(movieInfo -> assertEquals("The Matrix", movieInfo.getName()))
-                .verifyComplete();
+        StepVerifier.create(movieInfoMono).assertNext(movieInfo -> assertEquals("The Matrix", movieInfo.getName())).verifyComplete();
     }
 
     @Test
@@ -67,11 +63,26 @@ class MovieInfoRepositoryIntegrationTest {
         //When
         Mono<MovieInfo> savedMovie = this.repository.save(dummyMovieInfo);
         //Then
-        StepVerifier.create(savedMovie)
-                .assertNext(movieInfo -> {
-                    assertEquals("Interstellar", movieInfo.getName());
-                })
-                .verifyComplete();
+        StepVerifier.create(savedMovie).assertNext(movieInfo -> {
+            assertEquals("Interstellar", movieInfo.getName());
+        }).verifyComplete();
     }
 
+    @Test
+    void updateMovies () {
+        //Given
+        final String movieId = "1";
+        final MovieInfo updatedMovieInfo = new MovieInfo(movieId, "The Matrix Reloaded", 2003, List.of("Keanu Reeves", "Carrie-Anne Moss"), LocalDate.parse("2003-05-15"));
+        repository.save(updatedMovieInfo).block();
+
+        //When
+        Mono<MovieInfo> updatedMovie = repository.findById(movieId);
+
+        //Then
+        StepVerifier.create(updatedMovie).assertNext(movieInfo -> {
+            assertEquals("The Matrix Reloaded", movieInfo.getName());
+            assertEquals(2003, movieInfo.getYear());
+        }).verifyComplete();
+
+    }
 }

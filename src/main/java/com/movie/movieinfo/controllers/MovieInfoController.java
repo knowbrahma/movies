@@ -1,42 +1,39 @@
 package com.movie.movieinfo.controllers;
 
+import com.movie.movieinfo.model.MovieInfo;
 import com.movie.movieinfo.services.MovieInfoService;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/info")
 public class MovieInfoController {
 
+    private final MovieInfoService movieInfoService;
+
     public MovieInfoController (final MovieInfoService movieInfoService) {
+        this.movieInfoService = movieInfoService;
     }
 
-    @GetMapping("/test")
-    public Mono<String> getTestMessage() {
-        return Mono.just("This is a test message");
+    @PostMapping
+    public Mono<MovieInfo> createMovieInfo (@RequestBody MovieInfo movieInfo) {
+        return movieInfoService.save(movieInfo);
     }
-    
-    @GetMapping("/movie/{id}")
-    public Mono<String> findMovieInfoById(String id) {
-        return Mono.just("Placeholder: Get movie info by id");
+
+    @GetMapping("/{id}")
+    public Mono<MovieInfo> getMovieInfo (@PathVariable String id) {
+        return movieInfoService.findById(id);
     }
-    
-    @GetMapping("/movies")
-    public Mono<String> findAllMovies() {
-        return Mono.just("Placeholder: Get all movies");
+
+    @PutMapping("/{id}")
+    public Mono<MovieInfo> updateMovieInfo (@PathVariable String id, @RequestBody MovieInfo movieInfo) {
+        return movieInfoService.update(id, movieInfo);
     }
-    
-    @GetMapping("/create")
-    public Mono<String> createMovieInfo() {
-        return Mono.just("Placeholder: Create movie info");
+
+    @DeleteMapping("/{id}")
+    public Mono<Void> deleteMovieInfo (@PathVariable String id) {
+        return movieInfoService.deleteById(id);
     }
-    
-    @GetMapping("/update/{id}")
-    public Mono<String> updateMovieInfo(String id) {
-        return Mono.just("Placeholder: Update movie info");
-    }
-    
-    
+
+
 }
