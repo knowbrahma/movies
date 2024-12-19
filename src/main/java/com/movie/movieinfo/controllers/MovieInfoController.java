@@ -1,6 +1,7 @@
 package com.movie.movieinfo.controllers;
 
 import com.movie.movieinfo.services.MovieInfoService;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,7 +20,7 @@ public class MovieInfoController {
     }
     
     @GetMapping("/movie/{id}")
-    public Mono<String> findMovieInfoById(String id) {
+    public Mono<String> findMovieInfoById(@PathVariable String id) {
         return Mono.just("Placeholder: Get movie info by id");
     }
     
@@ -34,7 +35,7 @@ public class MovieInfoController {
     }
     
     @GetMapping("/update/{id}")
-    public Mono<String> updateMovieInfo(String id) {
+    public Mono<String> updateMovieInfo(@PathVariable String id) {
         return Mono.just("Placeholder: Update movie info");
     }
     
