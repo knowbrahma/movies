@@ -1,6 +1,7 @@
 package com.movie.movieinfo.model;
 
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
@@ -16,6 +17,7 @@ import java.util.List;
 
 @Validated
 @Document
+@Builder
 public class MovieInfo {
     @Id
     private String id;

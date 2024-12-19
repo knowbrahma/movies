@@ -1,43 +1,47 @@
 package com.movie.movieinfo.controllers;
 
+import com.movie.movieinfo.model.MovieInfo;
 import com.movie.movieinfo.services.MovieInfoService;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/info")
 public class MovieInfoController {
 
+    private final MovieInfoService movieInfoService;
+
     public MovieInfoController (final MovieInfoService movieInfoService) {
+        this.movieInfoService = movieInfoService;
     }
 
-    @GetMapping("/test")
-    public Mono<String> getTestMessage() {
-        return Mono.just("This is a test message");
+    @PostMapping("/movie")
+    @ResponseStatus(HttpStatus.CREATED)
+    public Mono<MovieInfo> createMovieInfo (@RequestBody MovieInfo movieInfo) {
+        return movieInfoService.save(movieInfo);
     }
-    
+
+    @GetMapping("/movie")
+    public Flux<MovieInfo> getAllMovies() {
+        return movieInfoService.findAll();
+    }
+
     @GetMapping("/movie/{id}")
-    public Mono<String> findMovieInfoById(@PathVariable String id) {
-        return Mono.just("Placeholder: Get movie info by id");
+    public Mono<MovieInfo> getMovieInfo (@PathVariable String id) {
+        return movieInfoService.findById(id);
     }
-    
-    @GetMapping("/movies")
-    public Mono<String> findAllMovies() {
-        return Mono.just("Placeholder: Get all movies");
+
+    @PutMapping("/movie/{id}")
+    public Mono<MovieInfo> updateMovieInfo (@PathVariable String id, @RequestBody MovieInfo movieInfo) {
+        return movieInfoService.update(id, movieInfo);
     }
-    
-    @GetMapping("/create")
-    public Mono<String> createMovieInfo() {
-        return Mono.just("Placeholder: Create movie info");
+
+    @DeleteMapping("/movie/{id}")
+    public Mono<Void> deleteMovieInfo (@PathVariable String id) {
+        return movieInfoService.deleteById(id);
     }
-    
-    @GetMapping("/update/{id}")
-    public Mono<String> updateMovieInfo(@PathVariable String id) {
-        return Mono.just("Placeholder: Update movie info");
-    }
-    
-    
+
+
 }
